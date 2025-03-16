@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vikunja.fullname" . }}-backend
+  labels:
+    {{ include "vikunja.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: backend
+  template:
+    metadata:
+      labels:
+        {{ include "vikunja.labels" . | nindent 8 }}
+        app.kubernetes.io/component: backend
+    spec:
+      hostAliases:
+      {{- range .Values.backend.hostAliases }}
+        - ip: "{{ .ip }}"
+          hostnames:
+          {{- range .hostnames }}
+            - "{{ . }}"
+          {{- end }}
+      {{- end }}
+      containers:
+        - name: vikunja-backend
+          image: "{{ .Values.backend.image }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: {{ .Values.backend.resources.requests.cpu }}
+              memory: {{ .Values.backend.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.backend.resources.limits.cpu }}
+              memory: {{ .Values.backend.resources.limits.memory }}
+          readinessProbe:
+            httpGet:
+              path: /api/v1/info
+              port: 3456
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/v1/info
+              port: 3456
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/vikunja/config.yml
+              subPath: config.yml
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "vikunja.fullname" . }}-config

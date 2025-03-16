@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "vikunja.fullname" . }}-config
+  labels:
+    {{ include "vikunja.labels" . | nindent 4 }}
+data:
+  config.yml: |-
+    db:
+      type: "postgres"
+      host: "{{ include "vikunja.fullname" . }}-database"
+      user: {{ .Values.database.user | quote }}
+      password: {{ .Values.database.password | quote }}
+      database: {{ .Values.database.database | quote }}
+
+    auth:
+      type: "oauth"
+      openid:
+        enabled: {{ .Values.keycloak.enabled }}
+        redirecturl: http://{{ .Values.ingress.hostname }}/auth/openid/
+        providers:
+          - name: Keycloak
+            authurl: http://{{ .Values.keycloak.host }}/realms/{{ .Values.keycloak.realm }}
+            logouturl: http://{{ .Values.keycloak.host }}/realms/{{ .Values.keycloak.realm }}/protocol/openid-connect/logout
+            clientid: {{ .Values.keycloak.clientId | quote }}
+            clientsecret: {{ .Values.keycloak.clientSecret | quote }}

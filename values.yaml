@@ -1,0 +1,56 @@
+fullnameOverride: "vikunja"
+frontend:
+  image: vikunja/frontend:0.22.1
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+backend:
+  image: vikunja/api:0.22.1
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+  hostAliases:
+    - ip: "10.105.177.82"
+      hostnames:
+        - "keycloak.local"
+
+database:
+  image: postgres:15
+  replicaCount: 1
+  storageSize: 2Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  user: vikunja
+  password: vikunjapassword
+  database: vikunja
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  hostname: vikunja.local
+
+keycloak:
+  enabled: true
+  host: keycloak.local
+  realm: master
+  clientId: vikunja_kc_client
+  clientSecret: "PbqYKYMT1v3Tf3NcKyJBgJxaPmgYb2ZA"
