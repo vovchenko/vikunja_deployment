@@ -1,7 +1,7 @@
 fullnameOverride: "vikunja"
 frontend:
   image: vikunja/frontend:0.22.1
-  replicaCount: 1
+  replicaCount: 3
   resources:
     requests:
       cpu: 100m
@@ -37,7 +37,7 @@ database:
       cpu: 500m
       memory: 512Mi
   user: vikunja
-  password: vikunjapassword
+  password: test
   database: vikunja
 
 service:

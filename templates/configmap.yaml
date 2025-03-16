@@ -6,7 +6,7 @@ metadata:
     {{ include "vikunja.labels" . | nindent 4 }}
 data:
   config.yml: |-
-    db:
+    database:
       type: "postgres"
       host: "{{ include "vikunja.fullname" . }}-database"
       user: {{ .Values.database.user | quote }}
@@ -17,7 +17,7 @@ data:
       type: "oauth"
       openid:
         enabled: {{ .Values.keycloak.enabled }}
-        redirecturl: http://{{ .Values.ingress.hostname }}/auth/openid/
+        redirecturl: http://{{ .Values.ingress.hostname }}/auth/openid
         providers:
           - name: Keycloak
             authurl: http://{{ .Values.keycloak.host }}/realms/{{ .Values.keycloak.realm }}
